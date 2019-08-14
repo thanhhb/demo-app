@@ -57,10 +57,7 @@ class LoginShopifyController extends Controller
             'password' => '',
         ]);
 
-        try {
-            $this->registerWebhooks($shopifyUser->name, $shopifyUser->token);
-        } catch (\Exception $ex) {
-        }
+        $this->registerWebhooks($shopifyUser->name, $shopifyUser->token);
 
         Auth::login($user, true);
 
