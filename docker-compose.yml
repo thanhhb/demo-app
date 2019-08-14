@@ -4,9 +4,6 @@ services:
     build:
       context: ./docker
       dockerfile: Dockerfile
-      args:
-        XDEBUG_HOST: 172.17.0.1
-        XDEBUG_PORT: 9000
     env_file:
       - .env
     volumes:
@@ -14,9 +11,6 @@ services:
       - ./storage:/storage
       - ./docker/php-fpm/conf.d/ah.conf:/usr/local/etc/php-fpm.d/ah.conf
       - ./docker/php-fpm/uploads.ini:/usr/local/etc/php/uploads.ini
-    environment:
-      - XDEBUG_CONFIG="remote_host=172.20.0.4"
-      - PHP_IDE_CONFIG="serverName=jo"
     depends_on:
       - db
 
