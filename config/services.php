@@ -44,4 +44,9 @@ return [
         ],
     ],
 
+    'shopify' => [
+        'client_id' => env('SHOPIFY_KEY'),
+        'client_secret' => env('SHOPIFY_SECRET'),
+        'redirect' => env('SHOPIFY_REDIRECT'),
+    ],
 ];
