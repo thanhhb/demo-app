@@ -43,7 +43,7 @@ class LoginShopifyController extends Controller
     }
 
     /**
-     * Handle shopify callback.
+     * Handle Shopify callback.
      */
     public function handleProviderCallback()
     {
@@ -65,7 +65,6 @@ class LoginShopifyController extends Controller
         }
 
         $this->registerWebhooks($shopDomain, $shopToken);
-
         Auth::login($user, true);
 
         return redirect('/home');
