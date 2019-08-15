@@ -1,13 +1,14 @@
 <?php
 namespace App\Http\Controllers\Auth;
 
+use Auth;
+use App\User;
+use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use Route;
 use Socialite;
-use Auth;
-use App\User;
 
 class LoginShopifyController extends Controller
 {
@@ -24,18 +25,20 @@ class LoginShopifyController extends Controller
             'domain' => 'string|required',
         ]);
 
-        $config = new \SocialiteProviders\Manager\Config(
-            env('SHOPIFY_KEY'),
-            env('SHOPIFY_SECRET'),
-            env('SHOPIFY_REDIRECT'),
+        $providerConfig = new \SocialiteProviders\Manager\Config(
+            config('shopify.key'),
+            config('shopify.secret'),
+            config('shopify.redirect'),
             [
                 'subdomain' => $request->get('domain'),
             ]
         );
 
+        $shopifyScopes = config('shopify.scopes');
+
         return Socialite::with('shopify')
-            ->setConfig($config)
-            ->scopes(['read_products', 'write_products'])
+            ->setConfig($providerConfig)
+            ->scopes($shopifyScopes)
             ->redirect();
     }
 
@@ -46,10 +49,8 @@ class LoginShopifyController extends Controller
     {
         $shopifyUser = Socialite::driver('shopify')->user();
         if (!$shopifyUser) {
-            return false;
+            return redirect('/');
         }
-
-        dd($shopifyUser);
 
         $user = User::firstOrCreate([
             'name' => $shopifyUser->nickname,
@@ -57,7 +58,13 @@ class LoginShopifyController extends Controller
             'password' => '',
         ]);
 
-        $this->registerWebhooks($shopifyUser->name, $shopifyUser->token);
+        $shopDomain = $shopifyUser->user['domain'] ?? '';
+        $shopToken = $shopifyUser->accessTokenResponseBody["access_token"] ?? '';
+        if (!$shopDomain || !$shopToken) {
+            return redirect('/');
+        }
+
+        $this->registerWebhooks($shopDomain, $shopToken);
 
         Auth::login($user, true);
 
@@ -67,64 +74,48 @@ class LoginShopifyController extends Controller
     /**
      * Register web hooks
      *
-     * @param $shop
+     * @param $shopDomain
      * @param $accessToken
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function registerWebhooks($shop, $accessToken)
+    private function registerWebhooks($shopDomain, $accessToken)
     {
-        $webHookRoutes = [
-            'webhook-uninstall-app',
-            'webhook-products-create',
-            'webhook-products-update',
-            'webhook-products-delete',
-            'webhook-shop-update',
-        ];
-
-        foreach ($webHookRoutes as $webHookRoute) {
-            $url = config('app.webhook_url') . route($webHookRoute, [], false);
-
-            $registerParams = [
-                "topic" => "app/uninstalled",
-                "address" => $url,
-                "format" => "json",
-            ];
-
-            $this->register($shop, $accessToken, $registerParams);
-        }
-    }
-
-    /**
-     * @param string $shop
-     * @param string $accessToken
-     * @param array $registerParams
-     * @return \Illuminate\Http\RedirectResponse|void
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    private function register($shop, $accessToken, $registerParams)
-    {
-        $endpoint = sprintf('https://%s/admin/api/%s/webhooks.json', $shop, '2019-04');
+        $webHookRoutes = config('shopify.webhook_routes');
+        $webhookVersion = config('shopify.webhook_version');
+        $registrationEndpoint = config('shopify.webhook_registration_endpoint');
+        $endpoint = sprintf($registrationEndpoint, $shopDomain, $webhookVersion);
 
         $client = new Client();
-        try {
-            $client->request('POST', $endpoint, [
+        foreach ($webHookRoutes as $topic => $webHookRoute) {
+            if (!Route::has($webHookRoute)) {
+                continue;
+            }
+
+            $addressUrl = config('shopify.webhook_url') . route($webHookRoute, [], false);
+            $requestParam = [
                 'headers' => [
                     'X-Shopify-Access-Token' => $accessToken,
                     'Content-Type' => 'application/x-www-form-urlencoded',
                 ],
                 'form_params' => [
-                    'webhook' => $registerParams,
+                    'webhook' => [
+                        "topic" => $topic,
+                        "address" => $addressUrl,
+                        "format" => "json",
+                    ],
                 ],
-            ]);
+            ];
 
-            return;
-        } catch (ClientException $ex) {
-            // 422 status code: webhook had already registered, ignore exception
-            if ($ex->getCode() != 422) {
-                Auth::guard()->logout();
+            try {
+                $client->request('POST', $endpoint, $requestParam);
+            } catch (ClientException $ex) {
+                // 422 status code: webhook had already registered, ignore exception
+                if ($ex->getCode() != 422) {
+                    Auth::logout();
 
-                return redirect()->route('identity-sign-in');
+                    return redirect()->route('identity-sign-in');
+                }
             }
         }
     }

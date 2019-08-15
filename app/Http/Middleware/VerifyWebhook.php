@@ -19,7 +19,7 @@ class VerifyWebhook
         $shop = request()->header('x-shopify-shop-domain');
         $data = request()->getContent();
 
-        $hmacLocal = base64_encode(hash_hmac('sha256', $data, env('SHOPIFY_SECRET'), true));
+        $hmacLocal = base64_encode(hash_hmac('sha256', $data, config('shopify.secret'), true));
         if (!hash_equals($hmac, $hmacLocal) || empty($shop)) {
             // Issue with HMAC or missing shop header
             abort(401, 'Invalid webhook signature');

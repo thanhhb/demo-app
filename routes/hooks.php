@@ -1,6 +1,6 @@
 <?php
 
-Route::group(['prefix' => 'webhook'], function () {
+Route::group(['prefix' => 'webhook', 'middleware' => ['webhook']], function () {
     Route::post('/uninstall', 'WebhookController@uninstall')->name('webhook-uninstall-app');
 
     Route::group(['prefix' => 'products'], function () {
