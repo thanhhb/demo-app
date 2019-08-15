@@ -6,6 +6,7 @@ use App\User;
 use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Route;
 use Socialite;
@@ -13,18 +14,26 @@ use Socialite;
 class LoginShopifyController extends Controller
 {
     /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param array $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'domain' => ['required'],
+        ]);
+    }
+
+    /**
      * Redirect to provider.
      *
      * @param Request $request
      * @return void
-     * @throws \Illuminate\Validation\ValidationException
      */
     public function redirectToProvider(Request $request)
     {
-        $this->validate($request, [
-            'domain' => 'string|required',
-        ]);
-
         $providerConfig = new \SocialiteProviders\Manager\Config(
             config('shopify.key'),
             config('shopify.secret'),
@@ -109,7 +118,7 @@ class LoginShopifyController extends Controller
             try {
                 $client->request('POST', $endpoint, $requestParam);
 
-                logger("Registered web hook: " .  json_encode($requestParam));
+                logger("Registered web hook: " . json_encode($requestParam));
             } catch (ClientException $ex) {
                 // 422 status code: webhook had already registered, ignore exception
                 if ($ex->getCode() != 422) {

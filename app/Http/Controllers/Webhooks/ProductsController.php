@@ -32,7 +32,7 @@ class ProductsController extends Controller
 
         Product::updateOrCreate(
             [
-                'shopify_product_id' => $shopifyProductResponse->getShopifyProductId()
+                'shopify_product_id' => $shopifyProductResponse->getShopifyProductId(),
             ],
             $shopifyProductResponse->toArray()
         );

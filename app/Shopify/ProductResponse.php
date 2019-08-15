@@ -25,7 +25,7 @@ final class ProductResponse
     private $updatedAt;
 
     /**
-     * @param $id
+     * @param $shopifyProductId
      * @param $title
      * @param $vendor
      * @param $productType
@@ -61,7 +61,7 @@ final class ProductResponse
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getShopifyProductId()
     {
@@ -69,7 +69,7 @@ final class ProductResponse
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getTitle()
     {
@@ -77,7 +77,7 @@ final class ProductResponse
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getVendor()
     {
@@ -85,7 +85,7 @@ final class ProductResponse
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getProductType()
     {
@@ -93,7 +93,7 @@ final class ProductResponse
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getHandle()
     {
@@ -101,7 +101,7 @@ final class ProductResponse
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getPublishedAt()
     {
@@ -109,7 +109,7 @@ final class ProductResponse
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getTags()
     {
@@ -117,7 +117,7 @@ final class ProductResponse
     }
 
     /**
-     * @return null
+     * @return string
      */
     public function getBodyHtml()
     {
@@ -125,7 +125,7 @@ final class ProductResponse
     }
 
     /**
-     * @return null
+     * @return string
      */
     public function getCreatedAt()
     {
@@ -133,7 +133,7 @@ final class ProductResponse
     }
 
     /**
-     * @return null
+     * @return string
      */
     public function getUpdatedAt()
     {
