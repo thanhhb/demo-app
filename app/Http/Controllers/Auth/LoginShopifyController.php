@@ -108,6 +108,8 @@ class LoginShopifyController extends Controller
 
             try {
                 $client->request('POST', $endpoint, $requestParam);
+
+                logger("Registered web hook: " .  json_encode($requestParam));
             } catch (ClientException $ex) {
                 // 422 status code: webhook had already registered, ignore exception
                 if ($ex->getCode() != 422) {

@@ -13,7 +13,8 @@
         "laravel/framework": "5.8.*",
         "laravel/socialite": "^4.1",
         "laravel/tinker": "^1.0",
-        "socialiteproviders/shopify": "^1.0"
+        "socialiteproviders/shopify": "^1.0",
+        "ext-json": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.6",

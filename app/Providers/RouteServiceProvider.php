@@ -39,7 +39,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        $this->mapWebHookRoutes();
+        $this->mapWebhookRoutes();
     }
 
     /**
@@ -61,11 +61,11 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function mapWebHookRoutes()
+    protected function mapWebhookRoutes()
     {
         Route::middleware('web')
              ->namespace($this->namespace)
-             ->group(base_path('routes/hooks.php'));
+             ->group(base_path('routes/webhooks.php'));
     }
 
     /**
