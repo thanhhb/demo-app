@@ -31,7 +31,9 @@ class ProductsController extends Controller
         );
 
         Product::updateOrCreate(
-            ['id' => $shopifyProductResponse->getId()],
+            [
+                'shopify_product_id' => $shopifyProductResponse->getShopifyProductId()
+            ],
             $shopifyProductResponse->toArray()
         );
     }
@@ -59,7 +61,7 @@ class ProductsController extends Controller
 
         Product::updateOrCreate(
             [
-                'shopify_product_id' => $shopifyProductResponse->getId()
+                'shopify_product_id' => $shopifyProductResponse->getShopifyProductId(),
             ],
             $shopifyProductResponse->toArray()
         );
@@ -72,8 +74,8 @@ class ProductsController extends Controller
      */
     public function handleDelete(Request $request)
     {
-        $deletedProduct = $request->getContent();
+        $deletedProduct = json_decode($request->getContent());
 
-        Product::destroy($deletedProduct->id);
+        Product::where('shopify_product_id', '=', $deletedProduct->id)->delete();
     }
 }

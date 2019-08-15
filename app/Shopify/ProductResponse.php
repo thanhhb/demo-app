@@ -4,7 +4,7 @@ namespace App\Shopify;
 
 final class ProductResponse
 {
-    private $id;
+    private $shopifyProductId;
 
     private $title;
 
@@ -37,7 +37,7 @@ final class ProductResponse
      * @param $updatedAt
      */
     public function __construct(
-        $id,
+        $shopifyProductId,
         $title,
         $vendor,
         $productType,
@@ -48,7 +48,7 @@ final class ProductResponse
         $createdAt = null,
         $updatedAt = null
     ) {
-        $this->id = $id;
+        $this->shopifyProductId = $shopifyProductId;
         $this->title = $title;
         $this->vendor = $vendor;
         $this->productType = $productType;
@@ -63,9 +63,9 @@ final class ProductResponse
     /**
      * @return mixed
      */
-    public function getId()
+    public function getShopifyProductId()
     {
-        return $this->id;
+        return $this->shopifyProductId;
     }
 
     /**
@@ -146,7 +146,7 @@ final class ProductResponse
     public function toArray(): array
     {
         return [
-            'shopify_product_id' => $this->id,
+            'shopify_product_id' => $this->shopifyProductId,
             'title' => $this->title,
             'body_html' => $this->bodyHtml,
             'vendor' => $this->vendor,
