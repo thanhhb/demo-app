@@ -86,6 +86,7 @@ class LoginShopifyController extends Controller
         $store->users()->syncWithoutDetaching([$user->id]);
 
         $this->registerWebhooks($shopifyUser->nickname, $shopifyUser->token);
+
         Auth::login($user, true);
 
         return redirect('/home');
