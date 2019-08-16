@@ -24,6 +24,7 @@ class SubscriptionController extends Controller
     /**
      * @param Request $request
      * @param int $storeId
+     * @return \Illuminate\Http\RedirectResponse
      * @throws Exception
      * @throws GuzzleException
      */
@@ -52,17 +53,52 @@ class SubscriptionController extends Controller
             ],
             'form_params' => [
                 'recurring_application_charge' => [
-                    "name" => trans('app.charge_name', ['appTitle' => config('app.name')]),
-                    "price" => 15, // config
-                    "trial_days" => 15, // config
-                    "return_url" => route('shopify.buy.callback', ['storeId' => $store->id]),
-                    "test" => $isDevEnv,
+                    'name' => config('app.name'),
+                    'price' => 15, // config
+                    'trial_days' => 15, // config
+                    'return_url' => route('shopify.buy.callback', ['storeId' => $store->id]),
+                    'test' => $isDevEnv,
                 ],
             ],
         ]);
 
         $resBody = $resp->getBody();
-        dd($resBody);
         $json = json_decode($resBody->getContents(), true);
+
+        return redirect()->away($json['recurring_application_charge']['confirmation_url']);
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     */
+    public function callback(Request $request)
+    {
+        $chargeId = $request->input('charge_id');
+
+        /** @var User $user */
+        $user = auth()->user();
+        $userToken = $user->getShopifyAccessToken();
+
+        /** @var Store $store */
+        $store = optional($user->stores)->first();
+        $storeDomain = $store->domain;
+
+        try {
+            $client = new Client();
+            $endpoint = sprintf('https://%s/admin/api/2019-07/recurring_application_charges/%s.json', $storeDomain, $chargeId);
+            $resp = $client->request('GET', $endpoint, [
+                'headers' => [
+                    'X-Shopify-Access-Token' => $userToken,
+                    'Content-Type' => 'application/json'
+                ]
+            ]);
+
+            $resBody = $resp->getBody();
+            $json = json_decode($resBody->getContents(), true);
+
+            dd($json);
+        } catch(Exception $ex) {
+
+        }
     }
 }

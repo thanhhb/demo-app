@@ -70,10 +70,11 @@ class LoginShopifyController extends Controller
             'password' => '',
         ]);
 
-        UserProvider::firstOrCreate([
+        UserProvider::updateOrCreate([
             'user_id' => $user->id,
             'provider' => 'shopify',
-            'provider_user_id' => $shopifyUser->id,
+            'provider_user_id' => $shopifyUser->id
+        ], [
             'provider_token' => $shopifyUser->token,
         ]);
 

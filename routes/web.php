@@ -10,7 +10,7 @@ Route::get('login/shopify', 'Auth\LoginShopifyController@redirectToProvider')->n
 Route::get('login/shopify/callback', 'Auth\LoginShopifyController@handleProviderCallback');
 
 Route::get('/stores/{storeId}/subscribe', 'SubscriptionController@index')->name('shopify.buy')->middleware('auth');
-Route::get('/stores/{storeId}/subscribe/callback', 'SubscriptionController@index')->name('shopify.buy.callback')->middleware('auth');
+Route::get('/stores/{storeId}/subscribe/callback', 'SubscriptionController@callback')->name('shopify.buy.callback')->middleware('auth');
 
 Route::get('/stores/{storeId}', 'StoreController@index')->name('store.index')->middleware(['subscribed', 'auth']);
 

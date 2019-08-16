@@ -52,4 +52,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(UserProvider::class);
     }
+
+    /**
+     * Check the case when have multiple rows.
+     */
+    public function getShopifyAccessToken()
+    {
+        return $this->providers->where('provider', 'shopify')->first();
+    }
 }
