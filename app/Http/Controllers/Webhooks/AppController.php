@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Webhooks;
 
 use App\Http\Controllers\Controller;
+use App\Store;
 use Illuminate\Http\Request;
 
 class AppController extends Controller
@@ -13,5 +14,7 @@ class AppController extends Controller
     public function uninstall(Request $request)
     {
         logger($request->getContent());
+        $response = json_decode($request->getContent());
+        $storeId = $response->id;
     }
 }

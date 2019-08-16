@@ -61,6 +61,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'webhook' => \App\Http\Middleware\VerifyWebhook::class,
+//        'subscribed' => \App\Http\Middleware\VerifyStoreIsSubscribed::class,
     ];
 
     /**

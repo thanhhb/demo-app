@@ -15,7 +15,10 @@ class CreateStoreChargesTable extends Migration
     {
         Schema::create('store_charges', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users');
             $table->string('name');
             $table->string('plan');
             $table->integer('quantity');

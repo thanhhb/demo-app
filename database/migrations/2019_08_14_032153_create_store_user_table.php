@@ -13,9 +13,15 @@ class CreateStoreUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('store_user', function (Blueprint $table) {
-            $table->unsignedBigInteger('store_id');
-            $table->unsignedBigInteger('user_id');
+        Schema::create('store_users', function (Blueprint $table) {
+            $table->unsignedBigInteger('store_id')
+                ->foreign('store_id')
+                ->references('id')
+                ->on('stores');
+            $table->unsignedBigInteger('user_id')
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users');
             $table->unique(['store_id', 'user_id']);
         });
     }
@@ -27,6 +33,6 @@ class CreateStoreUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('store_user');
+        Schema::dropIfExists('store_users');
     }
 }

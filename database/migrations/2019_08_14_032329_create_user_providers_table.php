@@ -15,7 +15,10 @@ class CreateUserProvidersTable extends Migration
     {
         Schema::create('user_providers', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users');
             $table->string('provider');
             $table->string('provider_user_id');
             $table->string('provider_token')->nullable();

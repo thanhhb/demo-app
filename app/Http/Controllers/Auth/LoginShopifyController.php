@@ -1,6 +1,8 @@
 <?php
 namespace App\Http\Controllers\Auth;
 
+use App\Store;
+use App\UserProvider;
 use Auth;
 use App\User;
 use App\Http\Controllers\Controller;
@@ -57,7 +59,8 @@ class LoginShopifyController extends Controller
     public function handleProviderCallback()
     {
         $shopifyUser = Socialite::driver('shopify')->user();
-        if (!$shopifyUser) {
+
+        if (!$shopifyUser || !$shopifyUser->id) {
             return redirect('/');
         }
 
@@ -67,13 +70,21 @@ class LoginShopifyController extends Controller
             'password' => '',
         ]);
 
-        $shopDomain = $shopifyUser->user['domain'] ?? '';
-        $shopToken = $shopifyUser->accessTokenResponseBody["access_token"] ?? '';
-        if (!$shopDomain || !$shopToken) {
-            return redirect('/');
-        }
+        UserProvider::firstOrCreate([
+            'user_id' => $user->id,
+            'provider' => 'shopify',
+            'provider_user_id' => $shopifyUser->id,
+            'provider_token' => $shopifyUser->token,
+        ]);
 
-        $this->registerWebhooks($shopDomain, $shopToken);
+        $store = Store::firstOrCreate([
+            'name' => $shopifyUser->name,
+            'domain' => $shopifyUser->nickname,
+        ]);
+
+        $store->users()->syncWithoutDetaching([$user->id]);
+
+        $this->registerWebhooks($shopifyUser->nickname, $shopifyUser->token);
         Auth::login($user, true);
 
         return redirect('/home');
